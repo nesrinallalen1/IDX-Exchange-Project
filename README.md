@@ -1,2 +1,2 @@
 # IDX-Exchange-Project
-Repository for projects as a software development intern at IDX Exchange
+Repository for property search project as an intern at IDX Exchange.
