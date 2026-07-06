@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const openhousesRouter = require('./routes/openhouses');
 const propertiesRouter = require('./routes/properties');
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ app.get('/', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.use('/api/properties', propertiesRouter);
+app.use('/api/openhouses', openhousesRouter);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

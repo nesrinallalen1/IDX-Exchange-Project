@@ -56,5 +56,27 @@ const [results] = await pool.query(query, values);
     });
   }
 });
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const [results] = await pool.query(
+      'SELECT * FROM rets_property WHERE L_ListingID = ?',
+      [id]
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: 'Property not found'
+      });
+    }
+
+    res.json(results[0]);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch property'
+    });
+  }
+});
 module.exports = router;
