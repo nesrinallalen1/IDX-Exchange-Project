@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
-
+import { useState } from 'react';
+import { isFavorite, toggleFavorite } from '../utils/favorites';
 function PropertyCard({ property }) {
+const [favorite, setFavorite] = useState(
+  isFavorite(property.L_ListingID)
+);
+
+function handleFavorite(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  setFavorite(toggleFavorite(property.L_ListingID));
+}
   return (
     <div
       style={{
@@ -19,6 +30,9 @@ function PropertyCard({ property }) {
           color: 'inherit'
         }}
       >
+<button onClick={handleFavorite}>
+  {favorite ? '❤️ Remove Favorite' : '🤍 Add Favorite'}
+</button>
         <h3>{property.L_Address}</h3>
 
         <p>

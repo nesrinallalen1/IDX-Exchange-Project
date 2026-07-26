@@ -9,9 +9,18 @@ function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [sortBy, setSortBy] = useState('');
+  const [sortOrder, setSortOrder] = useState('ASC');
+
   async function loadProperties(filters = {}) {
     try {
-      const data = await fetchProperties(filters);
+      setLoading(true);
+
+      const data = await fetchProperties({
+        ...filters,
+        ...(sortBy && { sortBy, sortOrder })
+      });
+
       setProperties(data.results);
       setError('');
     } catch (err) {
@@ -23,7 +32,7 @@ function ListingsPage() {
 
   useEffect(() => {
     loadProperties();
-  }, []);
+  }, [sortBy, sortOrder]);
 
   if (loading) {
     return <h2>Loading properties...</h2>;
@@ -44,6 +53,32 @@ function ListingsPage() {
       </p>
 
       <SearchBar onSearch={loadProperties} />
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>Sort by: </label>
+
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="">Default</option>
+          <option value="L_SystemPrice">Price</option>
+          <option value="BedroomsTotal">Bedrooms</option>
+          <option value="BathroomsTotalInteger">Bathrooms</option>
+          <option value="YearBuilt">Year Built</option>
+        </select>
+
+        {sortBy && (
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            style={{ marginLeft: '10px' }}
+          >
+            <option value="ASC">Low to High</option>
+            <option value="DESC">High to Low</option>
+          </select>
+        )}
+      </div>
 
       <p>
         <strong>Total Properties Loaded:</strong> {properties.length}
