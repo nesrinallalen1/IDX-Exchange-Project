@@ -1,17 +1,29 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { isFavorite, toggleFavorite } from '../utils/favorites';
+
 function PropertyCard({ property }) {
-const [favorite, setFavorite] = useState(
-  isFavorite(property.L_ListingID)
-);
+  const [favorite, setFavorite] = useState(
+    isFavorite(property.L_ListingID)
+  );
 
-function handleFavorite(e) {
-  e.preventDefault();
-  e.stopPropagation();
+  function handleFavorite(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-  setFavorite(toggleFavorite(property.L_ListingID));
-}
+    setFavorite(toggleFavorite(property.L_ListingID));
+  }
+
+  let photos = [];
+
+  try {
+    photos = property.L_Photos
+      ? JSON.parse(property.L_Photos)
+      : [];
+  } catch (error) {
+    console.error('Failed to parse property photos:', error);
+  }
+
   return (
     <div
       style={{
@@ -30,9 +42,24 @@ function handleFavorite(e) {
           color: 'inherit'
         }}
       >
-<button onClick={handleFavorite}>
-  {favorite ? '❤️ Remove Favorite' : '🤍 Add Favorite'}
-</button>
+        {photos.length > 0 && (
+          <img
+            src={photos[0]}
+            alt={property.L_Address}
+            style={{
+              width: '100%',
+              height: '220px',
+              objectFit: 'cover',
+              borderRadius: '8px',
+              marginBottom: '15px'
+            }}
+          />
+        )}
+
+        <button onClick={handleFavorite}>
+          {favorite ? '❤️ Remove Favorite' : '🤍 Add Favorite'}
+        </button>
+
         <h3>{property.L_Address}</h3>
 
         <p>

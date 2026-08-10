@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchProperty } from '../services/api';
@@ -7,59 +8,121 @@ function PropertyDetailPage() {
 
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
 
   useEffect(() => {
     async function loadProperty() {
-      const data = await fetchProperty(id);
-      setProperty(data);
-      setLoading(false);
+      try {
+        const data = await fetchProperty(id);
+        setProperty(data);
+      } catch (error) {
+        console.error('Failed to load property:', error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadProperty();
   }, [id]);
 
   if (loading) {
-    return <h2>Loading...</h2>;
+    return <h2>Loading property...</h2>;
+  }
+
+  if (!property) {
+    return <h2>Property not found.</h2>;
+  }
+
+  let photos = [];
+
+  try {
+    photos = property.L_Photos
+      ? JSON.parse(property.L_Photos)
+      : [];
+  } catch (error) {
+    console.error('Failed to parse property photos:', error);
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-<Link
-  to="/"
-  style={{
-    display: 'inline-block',
-    marginBottom: '20px',
-    textDecoration: 'none',
-    color: '#0066cc'
-  }}
->
-  ← Back to Listings
-</Link>
-      <h1>{property.L_Address}</h1>
+    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+
+      <Link to="/">
+        ← Back to Listings
+      </Link>
+
+      <h1>
+        {property.L_Address}
+      </h1>
 
       <h2>
-        {property.L_City}, {property.L_State}
+        {property.L_City}, {property.L_State} {property.L_Zip}
       </h2>
 
-      <h3>
+      {/* Main Photo */}
+      {photos.length > 0 && (
+        <div>
+          <img
+            src={photos[selectedPhoto]}
+            alt={property.L_Address}
+            style={{
+              width: '100%',
+              height: '500px',
+              objectFit: 'cover',
+              borderRadius: '10px'
+            }}
+          />
+
+          {/* Photo thumbnails */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '10px',
+              marginTop: '10px',
+              overflowX: 'auto'
+            }}
+          >
+            {photos.map((photo, index) => (
+              <img
+                key={index}
+                src={photo}
+                alt={`${property.L_Address} ${index + 1}`}
+                onClick={() => setSelectedPhoto(index)}
+                style={{
+                  width: '100px',
+                  height: '70px',
+                  objectFit: 'cover',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  border:
+                    selectedPhoto === index
+                      ? '3px solid #333'
+                      : '2px solid #ddd'
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h2>
         {Number(property.L_SystemPrice).toLocaleString('en-US', {
           style: 'currency',
           currency: 'USD'
         })}
-      </h3>
-<p><strong>Bedrooms:</strong> {property.BedroomsTotal}</p>
+      </h2>
 
-<p><strong>Bathrooms:</strong> {property.BathroomsTotalInteger}</p>
+      <p>
+        <strong>ZIP Code:</strong> {property.L_Zip}
+      </p>
 
-<p><strong>Living Area:</strong> {property.BuildingAreaTotal} sq ft</p>
+      <p>
+        <strong>Year Built:</strong> {property.YearBuilt}
+      </p>
 
-<p><strong>Property Type:</strong> {property.PropertyType}</p>
+      <p>
+        <strong>Days on Market:</strong> {property.DaysOnMarket}
+      </p>
 
-      <p><strong>ZIP Code:</strong> {property.L_Zip}</p>
-
-      <p><strong>Year Built:</strong> {property.YearBuilt}</p>
-
-      <p><strong>Days on Market:</strong> {property.DaysOnMarket}</p>
     </div>
   );
 }
