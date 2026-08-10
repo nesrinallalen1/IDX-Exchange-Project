@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { fetchProperties } from '../services/api';
 import PropertyCard from '../components/PropertyCard';
@@ -24,6 +25,7 @@ function ListingsPage() {
       setProperties(data.results);
       setError('');
     } catch (err) {
+      console.error(err);
       setError('Failed to load properties.');
     } finally {
       setLoading(false);
@@ -44,7 +46,11 @@ function ListingsPage() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">
+
+      <h1
+        className="page-title"
+        style={{ color: '#222' }}
+      >
         IDX Property Search
       </h1>
 
@@ -81,7 +87,8 @@ function ListingsPage() {
       </div>
 
       <p>
-        <strong>Total Properties Loaded:</strong> {properties.length}
+        <strong>Total Properties Loaded:</strong>{' '}
+        {properties.length}
       </p>
 
       <div className="property-grid">
@@ -92,6 +99,7 @@ function ListingsPage() {
           />
         ))}
       </div>
+
     </div>
   );
 }
