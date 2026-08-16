@@ -5,7 +5,14 @@ const api = axios.create({
 });
 
 export async function fetchProperties(params = {}) {
-  const response = await api.get('/properties', { params });
+  const response = await api.get('/properties', {
+    params: {
+      limit: params.limit || 20,
+      offset: params.offset || 0,
+      ...params,
+    },
+  });
+
   return response.data;
 }
 

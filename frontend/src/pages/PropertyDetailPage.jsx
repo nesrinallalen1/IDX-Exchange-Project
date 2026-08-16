@@ -2,10 +2,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchProperty } from '../services/api';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup
+} from 'react-leaflet';
 
+import 'leaflet/dist/leaflet.css';
 function PropertyDetailPage() {
   const { id } = useParams();
-
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
@@ -42,7 +48,13 @@ function PropertyDetailPage() {
   } catch (error) {
     console.error('Failed to parse property photos:', error);
   }
+const latitude = parseFloat(
+  property.LMD_MP_Latitude
+);
 
+const longitude = parseFloat(
+  property.LMD_MP_Longitude
+);
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
 
@@ -123,6 +135,42 @@ function PropertyDetailPage() {
         <strong>Days on Market:</strong> {property.DaysOnMarket}
       </p>
 
+<h3>Description</h3>
+
+<p>
+  {property.L_Remarks}
+</p>
+<h3>Location</h3>
+
+<a
+  href={`https://www.google.com/maps?q=${property.LMD_MP_Latitude},${property.LMD_MP_Longitude}`}
+  target="_blank"
+  rel="noreferrer"
+>
+  View Directions on Google Maps
+</a>
+<h3>Location</h3>
+
+<MapContainer
+  center={[latitude, longitude]}
+  zoom={15}
+  style={{
+    height: '400px',
+    width: '100%',
+    borderRadius: '10px'
+  }}
+>
+  <TileLayer
+    attribution='&copy; OpenStreetMap contributors'
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  />
+
+  <Marker position={[latitude, longitude]}>
+    <Popup>
+      {property.L_Address}
+    </Popup>
+  </Marker>
+</MapContainer>
     </div>
   );
 }

@@ -12,15 +12,19 @@ function ListingsPage() {
 
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('ASC');
+const [page, setPage] = useState(1);
 
+const limit = 20;
   async function loadProperties(filters = {}) {
     try {
       setLoading(true);
 
-      const data = await fetchProperties({
-        ...filters,
-        ...(sortBy && { sortBy, sortOrder })
-      });
+    const data = await fetchProperties({
+  limit,
+  offset: (page - 1) * limit,
+  ...filters,
+  ...(sortBy && { sortBy, sortOrder })
+});
 
       setProperties(data.results);
       setError('');
@@ -32,9 +36,9 @@ function ListingsPage() {
     }
   }
 
-  useEffect(() => {
-    loadProperties();
-  }, [sortBy, sortOrder]);
+useEffect(() => {
+  loadProperties();
+}, [sortBy, sortOrder, page]);
 
   if (loading) {
     return <h2>Loading properties...</h2>;
@@ -99,6 +103,31 @@ function ListingsPage() {
           />
         ))}
       </div>
+<div
+  style={{
+    marginTop: '30px',
+    display: 'flex',
+    gap: '10px',
+    justifyContent: 'center'
+  }}
+>
+  <button
+    onClick={() => setPage((p) => Math.max(1, p - 1))}
+    disabled={page === 1}
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {page}
+  </span>
+
+  <button
+    onClick={() => setPage((p) => p + 1)}
+  >
+    Next
+  </button>
+</div>
 
     </div>
   );
